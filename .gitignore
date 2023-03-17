@@ -1,3 +1,6 @@
 /venv
 
 /sandbox.py
+
+/chat_history.txt
+/system_history.txt

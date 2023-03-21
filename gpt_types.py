@@ -1,7 +1,6 @@
 from enum import Enum
+import re
 from typing import Any, Self
-
-import tiktoken
 
 
 Json = dict[str, Any]
@@ -53,12 +52,6 @@ class Message(DataClass):
         return cls(Role.USER, content)
 
 
-class Model(DataClass):
-    def __init__(self, model_str: str) -> None:
-        super().__init__()
-        self.model_str = model_str
-
-
 class Choice(DataClass):
     def __init__(self, finish_reason: FinishReason, message: Message) -> None:
         super().__init__()
@@ -70,6 +63,23 @@ class Choice(DataClass):
         return cls(
             FinishReason(raw["finish_reason"]), Message.from_json(raw["message"])
         )
+
+
+class Model(DataClass):
+    def __init__(self, version_or_family: str) -> None:
+        super().__init__()
+        if re.match(r".*-\d{4}$", version_or_family):
+            self.version = version_or_family
+            self.family = version_or_family[:-5]
+        else:
+            self.version = None
+            self.family = version_or_family
+
+    def __str__(self) -> str:
+        return self.version or self.family
+
+    def __repr__(self) -> str:
+        return f"<Model {self}>"
 
 
 class Usage(DataClass):
